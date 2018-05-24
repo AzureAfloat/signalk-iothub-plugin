@@ -10,5 +10,13 @@
     "signalk-node-server-plugin"
   ],
   "author": "Jeremy Foster <jeremy.foster@live.com> (http://codefoster.com)",
-  "license": "Apache 2.0"
+  "license": "Apache 2.0",
+  "dependencies": {
+    "azure-iot-device": "^1.4.1",
+    "azure-iot-device-amqp": "^1.4.1",
+    "command-line-args": "^5.0.2",
+    "dotenv": "^5.0.1",
+    "npm": "^6.0.1",
+    "ws": "^5.2.0"
+  }
 }
