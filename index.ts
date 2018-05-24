@@ -27,28 +27,19 @@ module.exports = function (app:any) {
           client.on('message', msg => {
               client.complete(msg, () => console.log('<-- cloud message received'));
           });
-         
-           var ws = new WebSocket("ws://localhost:3000/signalk/v1/stream?subscribe=all");
-           ws.onmessage = function (data:any) {
+          const ws = new WebSocket('ws://localhost:3000/signalk/v1/stream?subscribe=all');
           // send a D2C message repeatedly
-          setInterval(function () {
-              let message = new device.Message(JSON.stringify({
-                  deviceId: data.deviceName,
-                  value: data.value
-              }));
-              console.log('sending message to cloud -->');
-              client.sendEvent(message, (err,res) => {
-                  if(err) console.log(err);
-              });
-          }, 5000);
-        };
-      });
-    console.log("IoT Hub Plugin started");
+         ws.on('message', function incoming(data) {
+            console.log(data);
+            data = new device.Message();
+            client.sendEvent(data);
+            console.log("sending data");
+          });
+      });  
+      console.log("IoT Hub Plugin started");
     },
-    
     stop: function () {
       console.log('IoT Hub plugin stopped');
-
     }
   }
 }
