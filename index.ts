@@ -19,16 +19,18 @@ module.exports = function (app:any) {
       let deviceAmqp = require('azure-iot-device-amqp');
       let device = require('azure-iot-device');
       const WebSocket = require('ws');
-      let client = deviceAmqp.clientFromConnectionString("HostName=azaf-hub.azure-devices.net;DeviceId=rpz-cockpit;SharedAccessKey=msMd0OGVzYQdIRmaB0eq2/RELVGfFqzfdi582N9rQoA=");
+      let client = deviceAmqp.clientFromConnectionString("Your connection string goes here");
       client.open(err => {
-          const ws = new WebSocket('ws://localhost:3000/signalk/v1/stream?subscribe=all');
           // send a delta message repeatedly recieved via websocket
-         ws.on('message', function incoming(data) {
+          setInterval(function () { 
+            const ws = new WebSocket('ws://localhost:3000/signalk/v1/stream?subscribe=all');
+            ws.on('message', function incoming(data) {
             console.log(data);
             data = new device.Message();
-            client.sendEvent(data);
+             client.sendEvent(data);
             console.log("<--sending delta message");
           });
+        }, 3000);
       });  
       console.log("IoT Hub Plugin started");
     },
