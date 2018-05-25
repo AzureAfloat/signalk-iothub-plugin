@@ -21,19 +21,13 @@ module.exports = function (app:any) {
       const WebSocket = require('ws');
       let client = deviceAmqp.clientFromConnectionString("HostName=azaf-hub.azure-devices.net;DeviceId=rpz-cockpit;SharedAccessKey=msMd0OGVzYQdIRmaB0eq2/RELVGfFqzfdi582N9rQoA=");
       client.open(err => {
-          let deviceName = 'rpz-cockpit';
-          console.log(`acting as ${deviceName}`);
-          //handle C2D messages
-          client.on('message', msg => {
-              client.complete(msg, () => console.log('<-- cloud message received'));
-          });
           const ws = new WebSocket('ws://localhost:3000/signalk/v1/stream?subscribe=all');
-          // send a D2C message repeatedly
+          // send a delta message repeatedly recieved via websocket
          ws.on('message', function incoming(data) {
             console.log(data);
             data = new device.Message();
             client.sendEvent(data);
-            console.log("sending data");
+            console.log("<--sending delta message");
           });
       });  
       console.log("IoT Hub Plugin started");
