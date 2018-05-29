@@ -1,5 +1,5 @@
-module.exports = function (app:any) {
- 
+module.exports = function (app: any) {
+
   return {
     id: 'iothub',
     name: 'Azure IoT Hub',
@@ -12,27 +12,45 @@ module.exports = function (app:any) {
           type: 'string',
           title: 'The Signal K Server device\'s device connection string',
           description: 'You need to register your Signal K device in your Azure IoT Hub before it can communicate. Use the Azure Portal (http://portal.azure.com) or the Azure CLI to retrieve this device\'s connection string.'
+        },
+        devices: {
+          title: "Devices",
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              enabled: {
+                type: "boolean",
+                title: "Active"
+              },
+              deviceId: {
+                type: "string",
+                title: "Device ID"
+              },
+              deviceConnectionString: {
+                type: "string",
+                title: "Device Connection String"
+              }
+            }
+          }
         }
       }
     },
-    start: function (options:any) {
+    start: function (options: any) {
+
       let deviceAmqp = require('azure-iot-device-amqp');
       let device = require('azure-iot-device');
-      const WebSocket = require('ws');
-      let client = deviceAmqp.clientFromConnectionString("Your connection string goes here");
-      client.open(err => {
-          // send a delta message repeatedly recieved via websocket
-          setInterval(function () { 
-            const ws = new WebSocket('ws://localhost:3000/signalk/v1/stream?subscribe=all');
-            ws.on('message', function incoming(data) {
-            console.log(data);
-            data = new device.Message();
-             client.sendEvent(data);
-            console.log("<--sending delta message");
-          });
-        }, 3000);
-      });  
-      console.log("IoT Hub Plugin started");
+      let clients = {};
+      app.signalk.on("delta", d => d.updates.forEach(u => {
+        console.log(JSON.stringify(options.devices, null, 2))
+        if (!clients.hasOwnProperty(u.source.src)) {
+          clients[u.source.src] = deviceAmqp.clientFromConnectionString(options.devices.filter(d => d.deviceId == u.source.src)[0].deviceConnectionString);
+          clients[u.source.src].open()
+        }
+        setTimeout(() => {
+          clients[u.source.src].sendEvent(new device.Message(u))
+        }, 2000)
+      }))
     },
     stop: function () {
       console.log('IoT Hub plugin stopped');
