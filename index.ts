@@ -37,7 +37,6 @@ module.exports = function (app: any) {
       }
     },
     start: function (options: any) {
-
       let deviceAmqp = require('azure-iot-device-amqp');
       let device = require('azure-iot-device');
       let clients = {};
