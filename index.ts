@@ -40,14 +40,14 @@ module.exports = function (app: any) {
       let deviceAmqp = require('azure-iot-device-amqp');
       let device = require('azure-iot-device');
       let clients = {};
-      app.signalk.on("delta", d => d.updates.forEach(u => {
+      app.signalk.on("delta", delta => delta.updates.forEach(updates => {
         console.log(JSON.stringify(options.devices, null, 2))
-        if (!clients.hasOwnProperty(u.source.src)) {
-          clients[u.source.src] = deviceAmqp.clientFromConnectionString(options.devices.filter(d => d.deviceId == u.source.src)[0].deviceConnectionString);
-          clients[u.source.src].open()
+        if (!clients.hasOwnProperty(updates.source.src)) {
+          clients[updates.source.src] = deviceAmqp.clientFromConnectionString(options.devices.filter(d => d.deviceId == updates.source.src)[0].deviceConnectionString);
+          clients[updates.source.src].open()
         }
         setTimeout(() => {
-          clients[u.source.src].sendEvent(new device.Message(u))
+          clients[updates.source.src].sendEvent(new device.Message(updates))
         }, 2000)
       }))
     },
