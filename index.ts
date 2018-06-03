@@ -21,7 +21,8 @@ module.exports = function (app: any) {
             properties: {
               enabled: {
                 type: "boolean",
-                title: "Active"
+                title: "Active",
+                default: true
               },
               deviceId: {
                 type: "string",
