@@ -6,7 +6,6 @@ module.exports = function (app: any) {
     description: 'This plugin allows you to send all delta messages to Azure IoT Hub.',
     schema: {
       type: 'object',
-      required: ['IoTHubDeviceConnectionString'],
       properties: {
         devices: {
           title: "Devices",
@@ -19,13 +18,14 @@ module.exports = function (app: any) {
                 title: "Active",
                 default: true
               },
-              deviceId: {
+              deviceName: {
                 type: "string",
-                title: "Device ID"
+                title: "Device Name"
               },
               deviceConnectionString: {
                 type: "string",
-                title: "Device Connection String"
+                title: "Device Connection String",
+                mask: true
               }
             }
           }
@@ -33,17 +33,17 @@ module.exports = function (app: any) {
       }
     },
     start: function (options: any) {
+      console.log('Starting our plugin');
       let deviceAmqp = require('azure-iot-device-amqp');
       let device = require('azure-iot-device');
       let clients = {};
       app.signalk.on("delta", delta => delta.updates.forEach(updates => {
-        console.log(JSON.stringify(options.devices, null, 2))
-        if (!clients.hasOwnProperty(updates.source.src)) {
-          clients[updates.source.src] = deviceAmqp.clientFromConnectionString(options.devices.filter(d => d.deviceId == updates.source.src)[0].deviceConnectionString);
-          clients[updates.source.src].open()
+        if (!clients.hasOwnProperty(updates.source.deviceName)) {
+          clients[updates.source.deviceName] = deviceAmqp.clientFromConnectionString(options.devices.filter(d => d.deviceName == updates.source.deviceName)[0].deviceConnectionString);
+          clients[updates.source.deviceName].open()
         }
         setTimeout(() => {
-          clients[updates.source.src].sendEvent(new device.Message(updates))
+          clients[updates.source.deviceName].sendEvent(new device.Message(updates))
         }, 2000)
       }))
     },
