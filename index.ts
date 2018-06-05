@@ -1,3 +1,7 @@
+let deviceAmqp = require('azure-iot-device-amqp');
+// let device = require('azure-iot-device');
+let Message = require('azure-iot-device').Message;
+
 module.exports = function (app: any) {
 
   return {
@@ -35,17 +39,22 @@ module.exports = function (app: any) {
     },
     start: function (options: any) {
       console.log('Starting our plugin');
-      let deviceAmqp = require('azure-iot-device-amqp');
-      let device = require('azure-iot-device');
-      let clients = {};
-      app.signalk.on("delta", delta => delta.updates.forEach(updates => {
-        if (!clients.hasOwnProperty(updates.source.deviceName)) {
-          clients[updates.source.deviceName] = deviceAmqp.clientFromConnectionString(options.devices.filter(d => d.deviceName == updates.source.deviceName)[0].deviceConnectionString);
-          clients[updates.source.deviceName].open()
+
+      let configuredDevices = [...options.devices];
+      app.signalk.on("delta", delta => delta.updates.forEach(update => {
+        
+        //if the update is for a device that's been configured 
+        if(configuredDevices.some(d => d.deviceName == update.source.deviceName)) {
+          let configuredDevice = configuredDevices.find(d => d.deviceName == update.source.deviceName);
+          //if the client sdk doesn't already exist then create it
+          if (!(update.source.deviceName in configuredDevices)) {
+            configuredDevice.client = deviceAmqp.clientFromConnectionString(configuredDevices.find(d => d.deviceName == update.source.deviceName).deviceConnectionString);
+            configuredDevice.client.open()
+          }
+          setTimeout(() => {
+            configuredDevice.client.sendEvent(new Message(update))
+          }, 2000)
         }
-        setTimeout(() => {
-          clients[updates.source.deviceName].sendEvent(new device.Message(updates))
-        }, 2000)
       }))
     },
     stop: function () {
