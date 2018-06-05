@@ -25,6 +25,7 @@ module.exports = function (app: any) {
               deviceConnectionString: {
                 type: "string",
                 title: "Device Connection String",
+                require: true,
                 mask: true
               }
             }
