@@ -42,18 +42,16 @@ module.exports = function (app: any) {
 
       let configuredDevices = [...options.devices];
       app.signalk.on("delta", delta => delta.updates.forEach(update => {
-        
+
         //if the update is for a device that's been configured 
-        if(configuredDevices.some(d => d.deviceName == update.source.deviceName)) {
+        if (configuredDevices.some(d => d.deviceName == update.source.deviceName)) {
           let configuredDevice = configuredDevices.find(d => d.deviceName == update.source.deviceName);
           //if the client sdk doesn't already exist then create it
           if (!(update.source.deviceName in configuredDevices)) {
             configuredDevice.client = deviceAmqp.clientFromConnectionString(configuredDevices.find(d => d.deviceName == update.source.deviceName).deviceConnectionString);
             configuredDevice.client.open()
           }
-          setTimeout(() => {
-            configuredDevice.client.sendEvent(new Message(update))
-          }, 2000)
+          configuredDevice.client.sendEvent(new Message(update))
         }
       }))
     },
