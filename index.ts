@@ -1,11 +1,10 @@
 let deviceAmqp = require('azure-iot-device-amqp');
 let deviceHttp = require('azure-iot-device-http');
 let deviceMqtt = require('azure-iot-device-mqtt');
-// let device = require('azure-iot-device');
 let Message = require('azure-iot-device').Message;
 let protocol;
-module.exports = function (app: any) {
 
+module.exports = function (app: any) {
   return {
     id: 'iothub',
     name: 'Azure IoT Hub',
@@ -44,6 +43,7 @@ module.exports = function (app: any) {
         }
       }
     },
+
     start: function (options: any) {
       console.log('Starting our plugin');
       let configuredDevices = [...options.devices];
@@ -67,6 +67,7 @@ module.exports = function (app: any) {
         }
       }))
     },
+
     stop: function () {
       console.log('IoT Hub plugin stopped');
     }
