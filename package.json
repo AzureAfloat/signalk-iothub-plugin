@@ -12,11 +12,13 @@
   "author": "Jeremy Foster <jeremy.foster@live.com> (http://codefoster.com)",
   "license": "Apache 2.0",
   "dependencies": {
-    "azure-iot-device": "^1.4.1",
-    "azure-iot-device-amqp": "^1.4.1",
+    "azure-iot-device": "^1.7.0",
+    "azure-iot-device-amqp": "^1.7.0",
+    "azure-iot-device-http": "^1.7.1",
+    "azure-iot-device-mqtt": "^1.7.1",
     "command-line-args": "^5.0.2",
     "dotenv": "^5.0.1",
-    "npm": "^6.0.1",
+    "npm": "^6.1.0",
     "ws": "^5.2.0"
   }
 }
